@@ -1,24 +1,63 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Outlet } from "react-router";
 import './App.css';
+import Accordion from './Accordion'
+import SearchForm from './components/SearchForm'
+
 
 function App() {
+
+  const url: String = 'https://api.dictionaryapi.dev/api/v2/entries/en/'
+  const [data, setData] = React.useState('');
+  const [isShowAcc, setIsShowAcc] = React.useState(false);
+  const [isSave, setIsSave] = React.useState(false);
+
+  const onSubmitSearch = async (word: String) => {
+    if (!word.trim()) return;
+    try {
+      const response = await fetch(`${url}${word}`)
+      const data = await response.json()
+      if (response.ok && data.length) {
+        setData(JSON.stringify(data))
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  const showAccordion = ()=>{
+    if(isShowAcc){
+      setIsShowAcc(false)
+    } else{
+      setIsShowAcc(true)
+    }
+  }
+
+  const saveWord = ()=>{
+    if(isSave){
+      setIsSave(false)
+    } else{
+      setIsSave(true)
+    }
+  }
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchForm
+        onSubmitSearch={onSubmitSearch}
+      />
+      
+      <Accordion
+        dataWord={data}
+        showAccordion={showAccordion}
+        isShowAcc={isShowAcc}
+        isSave={isSave}
+        addSaveWord={saveWord}
+      />
+      <Outlet />
     </div>
   );
 }
